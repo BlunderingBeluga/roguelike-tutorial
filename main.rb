@@ -4,6 +4,7 @@ class Game
   def initialize
     Terminal.open
     Terminal.set("window.title = 'sample Ruby roguelike'")
+    Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=8x16")
     @player_x = 40
     @player_y = 12
     @last_event = nil
