@@ -1,0 +1,1 @@
+Font Fix15Mono-Bold.ttf is from https://github.com/LambdaHack/LambdaHack/blob/v0.8.1.2/GameDefinition/fonts/Fix15Mono-Bold.woff, a modified version of https://github.com/mozilla/Fira/blob/master/ttf/FiraMono-Bold.ttf. It is available under the SIL Open Font License.
