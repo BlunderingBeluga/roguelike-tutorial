@@ -10,7 +10,7 @@ class Game
   def setup
     Terminal.open
     Terminal.set("window.title = 'sample Ruby roguelike'")
-    Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=8x16")
+    Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
     Terminal.set("window.width = #{Config::MAP_WIDTH}")
     Terminal.set("window.height = #{Config::MAP_HEIGHT}")
     @actors = []
