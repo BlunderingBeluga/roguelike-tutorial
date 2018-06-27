@@ -1,12 +1,18 @@
 require './lib/BearLibTerminal'
 require './src/actor'
 require './src/map'
+require './src/rectangle'
+require './config'
 
 class Game
-  def initialize
+  attr_reader :player
+  
+  def setup
     Terminal.open
     Terminal.set("window.title = 'sample Ruby roguelike'")
     Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=8x16")
+    Terminal.set("window.width = #{Config::MAP_WIDTH}")
+    Terminal.set("window.height = #{Config::MAP_HEIGHT}")
     @actors = []
     
     @player = Actor.new(40, 12, '@', 'white')
@@ -48,4 +54,7 @@ class Game
   end
 end
 
-Game.new
+srand(400)
+
+$game = Game.new
+$game.setup
