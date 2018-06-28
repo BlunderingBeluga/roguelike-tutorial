@@ -54,7 +54,5 @@ class Game
   end
 end
 
-srand(400)
-
 $game = Game.new
 $game.setup
