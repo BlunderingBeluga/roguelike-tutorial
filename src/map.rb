@@ -39,7 +39,7 @@ class Map
       w = rand(Config::ROOM_MAX_SIZE - Config::ROOM_MIN_SIZE) + Config::ROOM_MIN_SIZE
       h = rand(Config::ROOM_MAX_SIZE - Config::ROOM_MIN_SIZE) + Config::ROOM_MIN_SIZE
       
-      x = rand(Config::MAP_WIDTH - w - 4) + 3
+      x = rand(Config::MAP_WIDTH - w - 4) + 3 # don't want either dimension of the room to be 1 or 2
       y = rand(Config::MAP_HEIGHT - h - 4) + 3
       
       new_room = Rect.new(x, y, w, h)

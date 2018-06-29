@@ -14,7 +14,7 @@ class Game
     Terminal.set("window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT}")
     @actors = []
     
-    @player = Actor.new(40, 12, '@', 'white')
+    @player = Actor.new(1, 1, '@', 'white')
     @actors << @player
     
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
