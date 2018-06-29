@@ -1,8 +1,8 @@
 module Config
   ROOM_MAX_SIZE = 10
   ROOM_MIN_SIZE = 6
-  MAX_ROOMS = 20
+  MAX_ROOMS = 30
   
-  MAP_WIDTH = 80
-  MAP_HEIGHT = 24
+  MAP_WIDTH = 60
+  MAP_HEIGHT = 40
 end

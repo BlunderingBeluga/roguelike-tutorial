@@ -11,14 +11,13 @@ class Game
     Terminal.open
     Terminal.set("window.title = 'sample Ruby roguelike'")
     Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
-    Terminal.set("window.width = #{Config::MAP_WIDTH}")
-    Terminal.set("window.height = #{Config::MAP_HEIGHT}")
+    Terminal.set("window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT}")
     @actors = []
     
     @player = Actor.new(40, 12, '@', 'white')
     @actors << @player
     
-    @map = Map.new(80, 24)
+    @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
     
     until @last_event == Terminal::TK_CLOSE
       Terminal.clear

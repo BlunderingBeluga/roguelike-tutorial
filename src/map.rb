@@ -39,8 +39,8 @@ class Map
       w = rand(Config::ROOM_MAX_SIZE - Config::ROOM_MIN_SIZE) + Config::ROOM_MIN_SIZE
       h = rand(Config::ROOM_MAX_SIZE - Config::ROOM_MIN_SIZE) + Config::ROOM_MIN_SIZE
       
-      x = rand(Config::MAP_WIDTH - w - 1)
-      y = rand(Config::MAP_HEIGHT - h - 1)
+      x = rand(Config::MAP_WIDTH - w - 4) + 3
+      y = rand(Config::MAP_HEIGHT - h - 4) + 3
       
       new_room = Rect.new(x, y, w, h)
       
@@ -49,26 +49,28 @@ class Map
         valid = false if new_room.intersect(other_room)
       end
       
-      create_room(new_room) if valid
+      if valid
+        create_room(new_room)
       
-      new_x, new_y = new_room.center
+        new_x, new_y = new_room.center
       
-      if num_rooms == 0
-        $game.player.x = new_x
-        $game.player.y = new_y
-      else
-        prev_x, prev_y = rooms.last.center
-        if rand(2)
-          create_h_tunnel(prev_x, new_x, prev_y)
-          create_v_tunnel(prev_y, new_y, new_x)
+        if num_rooms == 0
+          $game.player.x = new_x
+          $game.player.y = new_y
         else
-          create_v_tunnel(prev_y, new_y, prev_x)
-          create_h_tunnel(prev_x, new_x, new_y)
+          prev_x, prev_y = rooms.last.center
+          if rand(2)
+            create_h_tunnel(prev_x, new_x, prev_y)
+            create_v_tunnel(prev_y, new_y, new_x)
+          else
+            create_v_tunnel(prev_y, new_y, prev_x)
+            create_h_tunnel(prev_x, new_x, new_y)
+          end
         end
+        
+        rooms << new_room
+        num_rooms += 1
       end
-      
-      rooms << new_room
-      num_rooms += 1
     end
   end
   
