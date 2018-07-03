@@ -1,9 +1,10 @@
 class Tile
-  attr_accessor :can_walk, :lit
+  attr_accessor :can_walk, :lit, :explored
   
   def initialize(can_walk)
     @can_walk = can_walk
     @lit = false
+    @explored = false
   end
 end
 
@@ -37,6 +38,7 @@ class Map
   def light(x, y)
     return false if out_of_bounds?(x, y)
     @tiles[x + y * @width].lit = true
+    @tiles[x + y * @width].explored = true
   end
   
   def clear_lights
@@ -46,15 +48,24 @@ class Map
   def is_lit?(x, y)
     @tiles[x + y * @width].lit
   end
+  
+  def is_explored?(x, y)
+    @tiles[x + y * @width].explored
+  end
 
   def render
     @width.times do |x|
       @height.times do |y|
         char = ''
-        if is_lit?(x, y)
-          char = is_wall?(x, y) ? '#' : '.'
+        if is_explored?(x, y)
+          if is_wall?(x, y)
+            char = '#'
+          else
+            char = '.'
+          end
+          char = "[color=gray]#{char}[/color]" unless is_lit?(x, y)
         else
-          char = is_wall?(x, y) ? '#' : ' '
+          char = ' '
         end
         Terminal.print(x, y, char)
       end
