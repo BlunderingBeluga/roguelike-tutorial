@@ -110,6 +110,14 @@ class Map
         @tiles[x + y * width].can_walk = true
       end
     end
+    nb_monsters = rand(Config::MAX_ROOM_MONSTERS)
+    nb_monsters.times do
+      x = rand(room.x2 - room.x1) + room.x1
+      y = rand(room.y2 - room.y1) + room.y1
+      if not is_wall?(x, y) and not $game.actor_occupying(x, y)
+        $game.create_monster(x, y)
+      end
+    end
   end
   
   def create_h_tunnel(x1, x2, y)

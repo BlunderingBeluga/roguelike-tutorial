@@ -7,4 +7,6 @@ module Config
   MAP_HEIGHT = 40
   
   FOV_RADIUS = 8
+  
+  MAX_ROOM_MONSTERS = 3
 end

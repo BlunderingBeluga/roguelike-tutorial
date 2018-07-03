@@ -6,7 +6,7 @@ require './src/rectangle'
 require './config'
 
 class Game
-  attr_reader :player
+  attr_reader :player, :map
   
   def setup
     Terminal.open
@@ -15,7 +15,7 @@ class Game
     Terminal.set("window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT}")
     @actors = []
     
-    @player = Actor.new(1, 1, '@', 'white')
+    @player = Actor.new(1, 1, '@', 'you', 'white')
     @actors << @player
     
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
@@ -24,6 +24,8 @@ class Game
     
     @map.do_fov(@player.x, @player.y, Config::FOV_RADIUS)
     
+    @game_status = :idle
+    
     until @last_event == Terminal::TK_CLOSE
       Terminal.clear
       render
@@ -31,6 +33,26 @@ class Game
       @last_event = Terminal.read
       update
     end 
+  end
+  
+  def actor_occupying(x, y)
+    @actors.each do |actor|
+      if actor.x == x and actor.y == y
+        return actor
+      end
+    end
+    false
+  end
+  
+  def create_monster(x, y)
+    rng = rand(100)
+    if rng < 80
+      # create an orc
+      @actors << Actor.new(x, y, 'o', 'orc', 'green')
+    else
+      # create a troll
+      @actors << Actor.new(x, y, 'T', 'troll', '0,128,0')
+    end
   end
   
   def render
@@ -42,6 +64,8 @@ class Game
   end
   
   def update
+    @status = :idle
+    
     dx, dy = 0, 0
     
     case @last_event
@@ -58,10 +82,17 @@ class Game
       exit
     end
     
-    unless (dx == 0 and dy == 0) or @map.is_wall?(@player.x + dx, @player.y + dy)
-      @player.x += dx
-      @player.y += dy
-      @fov_recompute = true
+    unless (dx == 0 and dy == 0)
+      @status = :new_turn
+      @fov_recompute = true if @player.move_or_attack(dx, dy)
+    end
+    
+    if @status == :new_turn
+      @actors.each do |actor|
+        if @map.is_lit?(actor.x, actor.y) and actor != @player
+          actor.update
+        end
+      end
     end
     
     if @fov_recompute
