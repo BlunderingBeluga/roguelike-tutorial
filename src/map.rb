@@ -1,12 +1,15 @@
 class Tile
-  attr_accessor :can_walk
+  attr_accessor :can_walk, :lit
   
   def initialize(can_walk)
     @can_walk = can_walk
+    @lit = false
   end
 end
 
 class Map
+  include ShadowcastingFieldOfView
+  
   attr_reader :width, :height, :tiles
   
   def initialize(width, height)
@@ -19,14 +22,41 @@ class Map
     make_map
   end
   
+  def out_of_bounds?(x, y)
+    x < 0 or y < 0 or x >= @width or y >= @height
+  end
+  
   def is_wall?(x, y)
-    x < 0 or y < 0 or x >= @width or y >= @height or not @tiles[x + y * width].can_walk
+    out_of_bounds?(x, y) or not @tiles[x + y * width].can_walk
+  end
+  
+  def blocked?(x, y)
+    is_wall?(x, y)
+  end
+  
+  def light(x, y)
+    return false if out_of_bounds?(x, y)
+    @tiles[x + y * @width].lit = true
+  end
+  
+  def clear_lights
+    @tiles.each { |t| t.lit = false }
+  end
+  
+  def is_lit?(x, y)
+    @tiles[x + y * @width].lit
   end
 
   def render
     @width.times do |x|
       @height.times do |y|
-        Terminal.print(x, y, is_wall?(x, y) ? "#" : ".")
+        char = ''
+        if is_lit?(x, y)
+          char = is_wall?(x, y) ? '#' : '.'
+        else
+          char = is_wall?(x, y) ? '#' : ' '
+        end
+        Terminal.print(x, y, char)
       end
     end
   end

@@ -5,4 +5,6 @@ module Config
   
   MAP_WIDTH = 60
   MAP_HEIGHT = 40
+  
+  FOV_RADIUS = 8
 end

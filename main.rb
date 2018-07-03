@@ -1,4 +1,5 @@
 require './lib/BearLibTerminal'
+require './src/fov'
 require './src/actor'
 require './src/map'
 require './src/rectangle'
@@ -19,6 +20,10 @@ class Game
     
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
     
+    @fov_recompute = true
+    
+    @map.do_fov(@player.x, @player.y, Config::FOV_RADIUS)
+    
     until @last_event == Terminal::TK_CLOSE
       Terminal.clear
       render
@@ -32,24 +37,39 @@ class Game
     @map.render
     
     @actors.each do |actor|
-      actor.render
+      actor.render if @map.is_lit?(actor.x, actor.y)
     end
   end
   
   def update
+    dx, dy = 0, 0
+    
     case @last_event
     when Terminal::TK_UP
-      @player.y -= 1 unless @map.is_wall?(@player.x, @player.y - 1)
+      dy = -1
     when Terminal::TK_DOWN
-      @player.y += 1 unless @map.is_wall?(@player.x, @player.y + 1)
+      dy = 1
     when Terminal::TK_LEFT
-      @player.x -= 1 unless @map.is_wall?(@player.x - 1, @player.y)
+      dx = -1
     when Terminal::TK_RIGHT
-      @player.x += 1 unless @map.is_wall?(@player.x + 1, @player.y)
+      dx = 1
     when Terminal::TK_CLOSE
       Terminal.close
       exit
     end
+    
+    unless (dx == 0 and dy == 0) or @map.is_wall?(@player.x + dx, @player.y + dy)
+      @player.x += dx
+      @player.y += dy
+      @fov_recompute = true
+    end
+    
+    if @fov_recompute
+      @map.clear_lights
+      @map.do_fov(@player.x, @player.y, Config::FOV_RADIUS)
+    end
+    
+    @fov_recompute = false
   end
 end
 
