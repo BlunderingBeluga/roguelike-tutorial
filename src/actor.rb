@@ -12,15 +12,4 @@ class Actor
   def update
     @ai.update if @ai
   end
-  
-  def move_or_attack(dx, dy)
-    return false if $game.map.is_wall?(@x + dx, @y + dy)
-    if enemy = $game.actor_occupying(@x + dx, @y + dy) and enemy.blocks
-      $stderr.puts("The #{enemy.name} laughs at your puny efforts to attack him!")
-      return false
-    end
-    @x += dx
-    @y += dy
-    true
-  end
 end

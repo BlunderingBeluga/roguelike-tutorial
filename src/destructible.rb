@@ -39,7 +39,7 @@ end
 
 class MonsterDestructible < Destructible
   def die
-    $stderr.puts("#{@owner.name} is dead")
+    $game.gui.message("#{@owner.name} is dead", 'red')
     super
   end
 end
@@ -47,7 +47,7 @@ end
 class PlayerDestructible < Destructible
   def die
     # (singing) Humanity restored and then...
-    $stderr.puts("You died!")
+    $game.gui.message("You died!", 'red')
     super
     $game.status = :defeat
   end

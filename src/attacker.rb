@@ -8,7 +8,9 @@ class Attacker
   def attack(target)
     if target.destructible and not target.destructible.is_dead?
       if (@power - target.destructible.defense) > 0
-        $stderr.puts("#{@owner.name} attacks #{target.name} for #{@power - target.destructible.defense} hit points.")
+        $game.gui.message("#{@owner.name} attacks #{target.name} for " + 
+        "#{@power - target.destructible.defense} hit points.",
+        @owner == $game.player ? 'red' : 'yellow')
       else
         $stderr.puts("#{@owner.name} attacks #{target.name} but it has no effect!")
       end

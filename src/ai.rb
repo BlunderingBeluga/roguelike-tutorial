@@ -50,7 +50,7 @@ class PlayerAi < Ai
     $game.actors.each do |actor|
       if actor.destructible and actor.destructible.is_dead? and
         actor.x == tx and actor.y == ty
-        $stderr.puts("There's a #{actor.name} here")
+        $game.gui.message("There's a #{actor.name} here", 'white')
       end
     end
     

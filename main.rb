@@ -1,4 +1,6 @@
 require './lib/BearLibTerminal'
+require './config'
+require './src/gui'
 require './src/fov'
 require './src/actor'
 require './src/destructible'
@@ -6,17 +8,20 @@ require './src/ai'
 require './src/attacker'
 require './src/map'
 require './src/rectangle'
-require './config'
+
 
 class Game
   attr_accessor :status, :fov_recompute
-  attr_reader :player, :map, :last_event, :actors
+  attr_reader :player, :map, :last_event, :actors, :gui
   
   def setup
     Terminal.open
     Terminal.set("window.title = 'sample Ruby roguelike'")
     Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
-    Terminal.set("window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT + 2}")
+    Terminal.set(
+      "window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT + Config::Gui::PANEL_HEIGHT}")
+    
+    @gui = Gui.new(1, Config::MAP_HEIGHT)
     @actors = []
     
     @player = Actor.new(1, 1, '@', 'player', 'white')
@@ -32,6 +37,7 @@ class Game
     @map.do_fov(@player.x, @player.y, Config::FOV_RADIUS)
     
     @game_status = :idle
+    @gui.message("Welcome, stranger! Prepare to perish!", 'green')
     
     until @last_event == Terminal::TK_CLOSE
       Terminal.clear
@@ -77,8 +83,7 @@ class Game
       actor.render if @map.is_lit?(actor.x, actor.y)
     end
     
-    Terminal.print(1, Config::MAP_HEIGHT,
-      "HP: #{@player.destructible.hp}/#{@player.destructible.max_hp}")
+    @gui.render
   end
   
   def update
