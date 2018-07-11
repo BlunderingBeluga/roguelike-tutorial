@@ -98,11 +98,9 @@ class MonsterAi < Ai
       @owner.y = ty
     elsif not $game.map.is_wall?(tx, @owner.y) and
       not $game.actor_occupying(tx, @owner.y)
-      $stderr.puts "Allowing for x"
       @owner.x = tx
     elsif not $game.map.is_wall?(@owner.x, ty) and
       not $game.actor_occupying(@owner.x, ty)
-      $stderr.puts "Allowing for y"
       @owner.y = ty
     else
       return false
