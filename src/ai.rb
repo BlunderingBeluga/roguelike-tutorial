@@ -93,14 +93,15 @@ class MonsterAi < Ai
     end
     
     # slide along walls
-    if not $game.map.is_wall?(tx, ty) and not $game.actor_occupying(tx, ty)
+    if not $game.map.is_wall?(tx, ty) and
+      not (a = $game.actor_occupying(tx, ty) and a.blocks)
       @owner.x = tx
       @owner.y = ty
     elsif not $game.map.is_wall?(tx, @owner.y) and
-      not $game.actor_occupying(tx, @owner.y)
+      not (a = $game.actor_occupying(tx, @owner.y) and a.blocks)
       @owner.x = tx
     elsif not $game.map.is_wall?(@owner.x, ty) and
-      not $game.actor_occupying(@owner.x, ty)
+      not  (a = $game.actor_occupying(@owner.x, ty) and a.blocks)
       @owner.y = ty
     else
       return false
