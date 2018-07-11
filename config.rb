@@ -10,6 +10,9 @@ module Config
   
   MAX_ROOM_MONSTERS = 3
   
+  # how many turns monsters continue to chase players who have gone out of view
+  TRACKING_TURNS = 3
+  
   module Gui
     PANEL_HEIGHT = 7
     BAR_WIDTH = 20 # width of health, mana, etc. display bars

@@ -92,9 +92,7 @@ class Game
     @player.update
     if @status == :new_turn
       @actors.each do |actor|
-        if @map.is_lit?(actor.x, actor.y) and actor != @player
-          actor.update
-        end
+        actor.update if actor != @player
       end
     end
     

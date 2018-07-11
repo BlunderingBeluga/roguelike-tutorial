@@ -9,7 +9,7 @@ class Ai
   end
 end
 
-class PlayerAi < Ai
+class PlayerAi < Ai  
   def update
     return false if @owner.destructible and @owner.destructible.is_dead?
     
@@ -60,46 +60,52 @@ class PlayerAi < Ai
 end
 
 class MonsterAi < Ai
+  def initialize(owner)
+    super
+    @move_count = 0
+  end
+  
   def update
     return false if @owner.destructible and @owner.destructible.is_dead?
-    px, py = $game.player.x, $game.player.y
-    
-    # FIXME
-    if @owner.x < px
-      dx = 1
-    elsif @owner.x > px
-      dx = -1
-    else
-      dx = 0
-    end
-    
-    if @owner.y < py
-      dy = 1
-    elsif @owner.y > py
-      dy = -1
-    else
-      dy = 0
-    end
     
     if $game.map.is_lit?(@owner.x, @owner.y)
-      move_or_attack(dx, dy)
+      @move_count = Config::TRACKING_TURNS
+    else
+      @move_count -= 1
+    end
+    if @move_count > 0
+      px, py = $game.player.x, $game.player.y
+      
+      dx = px - @owner.x
+      dy = py - @owner.y
+      stepdx = dx == 0 ? 0 : (dx > 0 ? 1 : -1)
+      stepdy = dy == 0 ? 0 : (dy > 0 ? 1 : -1)
+      
+      move_or_attack(stepdx, stepdy)
     end
   end
   
   def move_or_attack(dx, dy)
     tx, ty = @owner.x + dx, @owner.y + dy # target coordinates
-    return false if $game.map.is_wall?(tx, ty)
-    
-    $game.actors.each do |actor|
-      if actor != self and actor.x == tx and actor.y == ty
-        if actor == $game.player 
-          @owner.attacker.attack($game.player)
-        end
-        return false
-      end
+    if $game.actor_occupying(tx, ty) == $game.player
+      @owner.attacker.attack($game.player)
+      return true
     end
     
-    @owner.x = tx
-    @owner.y = ty
+    # slide along walls
+    if not $game.map.is_wall?(tx, ty) and not $game.actor_occupying(tx, ty)
+      @owner.x = tx
+      @owner.y = ty
+    elsif not $game.map.is_wall?(tx, @owner.y) and
+      not $game.actor_occupying(tx, @owner.y)
+      $stderr.puts "Allowing for x"
+      @owner.x = tx
+    elsif not $game.map.is_wall?(@owner.x, ty) and
+      not $game.actor_occupying(@owner.x, ty)
+      $stderr.puts "Allowing for y"
+      @owner.y = ty
+    else
+      return false
+    end
   end
 end
