@@ -24,6 +24,29 @@ class PlayerAi < Ai
       dx = -1
     when Terminal::TK_RIGHT
       dx = 1
+    when Terminal::TK_G
+      # _G_et item
+      found = false
+      if actor = $game.actor_occupying(@owner.x, @owner.y) and actor.pickable
+        if actor.pickable.pick(@owner)
+          found = true
+          $game.status = :new_turn
+          $game.gui.message("You pick up the #{actor.name}.", 'white')
+        else
+          found = true
+          $game.gui.message("Your inventory is full.", 'red')
+        end
+      end
+      unless found
+        $game.gui.message("Nothing to pick up here.", 'white')
+      end
+    when Terminal::TK_I
+      # View _I_nventory
+      actor = choose_from_inventory
+      if actor
+        actor.pickable.use(@owner)
+        $game.status = :new_turn
+      end
     when Terminal::TK_CLOSE
       Terminal.close
       exit
@@ -47,15 +70,37 @@ class PlayerAi < Ai
       end
     end
     
-    $game.actors.each do |actor|
-      if actor.destructible and actor.destructible.is_dead? and
-        actor.x == tx and actor.y == ty
-        $game.gui.message("There's a #{actor.name} here", 'white')
+    if actor = $game.actor_occupying(tx, ty)
+      if (actor.destructible and actor.destructible.is_dead?) or actor.pickable
+        $game.gui.message("There's a #{actor.name} here.", 'white')
       end
     end
     
     @owner.x = tx
     @owner.y = ty
+  end
+  
+  def choose_from_inventory
+    Terminal.clear
+    Terminal.print(1, 1, "inventory")
+    shortcut = 'a'
+    @owner.container.inventory.each_with_index do |actor, y|
+      Terminal.print(2, y + 2, "#{shortcut} #{actor.name}")
+    end
+    Terminal.refresh
+    key = Terminal.read
+    
+    # This is a bit weird.
+    # Terminal.read returns an integer. lib/BearLibTerminal.rb shows how key presses
+    # are mapped to constants (Terminal::TK_A and so on). "a" is 4, so we subtract 4
+    # to correct for that. `idx` gives us 0 for a, 1 for b, etc., so keys are
+    # correctly mapped to items in the inventory array. 
+    idx = key - 4
+    if idx >= 0 and idx < @owner.container.inventory.size
+      return @owner.container.inventory[idx]
+    else
+      nil
+    end
   end
 end
 

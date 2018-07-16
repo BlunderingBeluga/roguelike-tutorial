@@ -5,6 +5,8 @@ require './src/fov'
 require './src/actor'
 require './src/destructible'
 require './src/ai'
+require './src/pickable'
+require './src/container'
 require './src/attacker'
 require './src/map'
 require './src/rectangle'
@@ -28,9 +30,10 @@ class Game
     @player.destructible = PlayerDestructible.new(player, 30, 2, 'your cadaver')
     @player.attacker = Attacker.new(player, 5)
     @player.ai = PlayerAi.new(player)
-    @actors << @player
+    @player.container = Container.new(player, 26)
     
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
+    @actors << @player # player must be first in list to render on top
     
     @fov_recompute = true
     
@@ -74,6 +77,12 @@ class Game
       troll.ai = MonsterAi.new(troll)
       @actors << troll
     end
+  end
+  
+  def create_item(x, y)
+    health_potion = Actor.new(x, y, '!', 'health potion', 'purple', false)
+    health_potion.pickable = Healer.new(health_potion, 4)
+    @actors << health_potion
   end
   
   def render

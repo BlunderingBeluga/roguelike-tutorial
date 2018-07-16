@@ -35,6 +35,15 @@ class Destructible
     @owner.blocks = false
     $game.send_to_back(@owner)
   end
+  
+  def heal(amount)
+    @hp += amount;
+    if @hp > @max_hp
+      amount -= (@hp - @max_hp)
+      @hp = @max_hp
+    end
+    amount
+  end
 end
 
 class MonsterDestructible < Destructible

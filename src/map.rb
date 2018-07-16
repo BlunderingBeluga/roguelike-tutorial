@@ -121,6 +121,14 @@ class Map
         @tiles[x + y * width].can_walk = true
       end
     end
+    nb_items = rand(Config::MAX_ROOM_ITEMS)
+    nb_items.times do
+      x = rand(room.x2 - room.x1) + room.x1
+      y = rand(room.y2 - room.y1) + room.y1
+      if not is_wall?(x, y) and not $game.actor_occupying(x, y)
+        $game.create_item(x, y)
+      end
+    end
     nb_monsters = rand(Config::MAX_ROOM_MONSTERS)
     nb_monsters.times do
       x = rand(room.x2 - room.x1) + room.x1

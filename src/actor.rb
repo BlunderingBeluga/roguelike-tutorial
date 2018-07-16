@@ -1,5 +1,6 @@
 class Actor
-  attr_accessor :x, :y, :char, :name, :color, :blocks, :attacker, :destructible, :ai
+  attr_accessor :x, :y, :char, :name, :color, :blocks, :attacker, :destructible,
+    :ai, :pickable, :container
   
   def initialize(x, y, char, name, color, blocks = true)
     @x, @y, @char, @name, @color, @blocks = x, y, char, name, color, blocks

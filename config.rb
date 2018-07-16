@@ -9,6 +9,7 @@ module Config
   FOV_RADIUS = 8
   
   MAX_ROOM_MONSTERS = 3
+  MAX_ROOM_ITEMS = 2
   
   # how many turns monsters continue to chase players who have gone out of view
   TRACKING_TURNS = 3
