@@ -46,7 +46,7 @@ class Map
   end
   
   def is_lit?(x, y)
-    @tiles[x + y * @width].lit
+    @tiles[x + y * @width] and @tiles[x + y * @width].lit
   end
   
   def is_explored?(x, y)

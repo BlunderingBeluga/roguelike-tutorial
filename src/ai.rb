@@ -88,7 +88,12 @@ class PlayerAi < Ai
       Terminal.print(2, y + 2, "#{shortcut} #{actor.name}")
     end
     Terminal.refresh
-    key = Terminal.read
+    # making "mouse move" an input type requires a lot of places to specify that
+    # moving the mouse doesn't count as "pressing a key"
+    key = Terminal::TK_MOUSE_MOVE
+    until key != Terminal::TK_MOUSE_MOVE
+      key = Terminal.read 
+    end
     
     # This is a bit weird.
     # Terminal.read returns an integer. lib/BearLibTerminal.rb shows how key presses
@@ -146,10 +151,40 @@ class MonsterAi < Ai
       not (a = $game.actor_occupying(tx, @owner.y) and a.blocks)
       @owner.x = tx
     elsif not $game.map.is_wall?(@owner.x, ty) and
-      not  (a = $game.actor_occupying(@owner.x, ty) and a.blocks)
+      not (a = $game.actor_occupying(@owner.x, ty) and a.blocks)
       @owner.y = ty
     else
       return false
+    end
+  end
+end
+
+class ConfusedMonsterAi < Ai
+  def initialize(owner, nb_turns, old_ai)
+    @owner, @nb_turns, @old_ai = owner, nb_turns, old_ai
+    @old_color = @owner.color
+    @owner.color = 'violet'
+  end
+  
+  def update
+    dx = rand(3) - 1
+    dy = rand(3) - 1
+    
+    tx = @owner.x + dx
+    ty = @owner.y + dy
+    if not $game.map.is_wall?(tx, ty) and
+      not (a = $game.actor_occupying(tx, ty) and a.blocks)
+      @owner.x = tx
+      @owner.y = ty
+    elsif a = $game.actor_occupying(tx, ty)
+      @owner.attacker.attack(a)
+    end
+    @nb_turns -= 1
+    if @nb_turns <= 0
+      $game.gui.message("The #{@owner.name} is no longer confused!", 'red')
+      @owner.ai = @old_ai
+      # corpses should remain red
+      @owner.color = @old_color unless @owner.destructible.is_dead? 
     end
   end
 end

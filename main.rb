@@ -20,6 +20,7 @@ class Game
     Terminal.open
     Terminal.set("window.title = 'sample Ruby roguelike'")
     Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
+    Terminal.set("input.filter = [keyboard, mouse]")
     Terminal.set(
       "window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT + Config::Gui::PANEL_HEIGHT}")
     
@@ -80,9 +81,28 @@ class Game
   end
   
   def create_item(x, y)
-    health_potion = Actor.new(x, y, '!', 'health potion', 'purple', false)
-    health_potion.pickable = Healer.new(health_potion, 4)
-    @actors << health_potion
+    dice = rand(100)
+    if dice < 70
+      # create a health potion
+      health_potion = Actor.new(x, y, '!', 'health potion', 'purple', false)
+      health_potion.pickable = Healer.new(health_potion, 4)
+      @actors << health_potion
+    elsif dice < 80
+      # create a scroll of lightning bolt
+      lightning_scroll = Actor.new(x, y, '#', 'scroll of lightning bolt', 'yellow', false)
+      lightning_scroll.pickable = LightningBolt.new(lightning_scroll, 5, 20)
+      @actors << lightning_scroll
+    elsif dice < 90
+      # create a scroll of fireball
+      fireball_scroll = Actor.new(x, y, '#', 'scroll of fireball', 'orange', false)
+      fireball_scroll.pickable = Fireball.new(fireball_scroll, 3, 12)
+      @actors << fireball_scroll
+    else
+      # create a scroll of confusion
+      confusion_scroll = Actor.new(x, y, '#', 'scroll of confusion', 'violet', false)
+      confusion_scroll.pickable = Confuser.new(confusion_scroll, 10, 8)
+      @actors << confusion_scroll
+    end
   end
   
   def render
@@ -116,6 +136,59 @@ class Game
   def send_to_back(actor)
     @actors.delete(actor)
     @actors.insert(0, actor)
+  end
+  
+  def distance_between(x1, y1, x2, y2)
+    dx = x2 - x1
+    dy = y2 - y1
+    Math.sqrt(dx * dx + dy * dy)
+  end
+  
+  def closest_monster(x, y, range)
+    closest = nil
+    best_distance = 1000
+    @actors.each do |actor|
+      if actor != @player and actor.destructible and not actor.destructible.is_dead?
+        distance = distance_between(actor.x, actor.y, x, y)
+        if distance < best_distance and (distance <= range or range == 0)
+          best_distance = distance
+          closest = actor
+        end
+      end
+    end
+    closest
+  end
+  
+  def mouse_x
+    Terminal.state(Terminal::TK_MOUSE_X)
+  end
+  
+  def mouse_y
+    Terminal.state(Terminal::TK_MOUSE_Y)
+  end
+
+  def pick_a_tile(max_range)
+    loop do
+      Terminal.clear
+      # print green square if mouse is in range, red otherwise
+      if @map.is_lit?(mouse_x, mouse_y) and (max_range == 0 or
+        distance_between(@player.x, @player.y, mouse_x, mouse_y) <= max_range)
+        Terminal.print(mouse_x, mouse_y, "[bkcolor=green] [/bkcolor]")
+      else
+        Terminal.print(mouse_x, mouse_y, "[bkcolor=red] [/bkcolor]")
+      end
+      render
+      Terminal.refresh
+      key = Terminal.read
+      if key == Terminal::TK_MOUSE_LEFT
+        return [mouse_x, mouse_y]
+      elsif key == Terminal::TK_MOUSE_RIGHT
+        return false
+      elsif key == Terminal::TK_CLOSE
+        Terminal.close
+        exit
+      end
+    end
   end
 end
 
