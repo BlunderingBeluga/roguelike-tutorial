@@ -85,7 +85,8 @@ class PlayerAi < Ai
     Terminal.print(1, 1, "inventory")
     shortcut = 'a'
     @owner.container.inventory.each_with_index do |actor, y|
-      Terminal.print(2, y + 2, "#{shortcut} #{actor.name}")
+      Terminal.print(2, y + 2, "(#{shortcut}) #{actor.name}")
+      shortcut = shortcut.succ
     end
     Terminal.refresh
     # making "mouse move" an input type requires a lot of places to specify that
