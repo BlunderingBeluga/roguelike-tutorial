@@ -8,5 +8,4 @@
 ## Features
 
 * `Menu` class and debug menu to spawn items & monsters
-* Improve display of items with range (`Game#pick_a_tile`) (less garish colors, show the affected area of area effects)
 * Allow overly long log messages to wrap
