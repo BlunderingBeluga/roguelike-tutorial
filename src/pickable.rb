@@ -18,6 +18,16 @@ class Pickable
     end
     false
   end
+  
+  def drop(wearer)
+    if wearer.container
+      wearer.container.remove(@owner)
+      $game.add_actor(@owner)
+      @owner.x = wearer.x
+      @owner.y = wearer.y
+      $game.gui.message("#{wearer.name} drops a #{@owner.name}.", 'white')
+    end
+  end
 end
 
 class Healer < Pickable

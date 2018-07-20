@@ -27,14 +27,14 @@ class Game
     @gui = Gui.new(1, Config::MAP_HEIGHT)
     @actors = []
     
-    @player = Actor.new(1, 1, '@', 'player', 'white')
+    @player = Actor.new(1, 1, '@', 'player', 'white', 1)
     @player.destructible = PlayerDestructible.new(player, 30, 2, 'your cadaver')
     @player.attacker = Attacker.new(player, 5)
     @player.ai = PlayerAi.new(player)
     @player.container = Container.new(player, 26)
+    add_actor(@player)
     
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
-    @actors << @player # player must be first in list to render on top
     
     @fov_recompute = true
     
@@ -52,6 +52,15 @@ class Game
     end 
   end
   
+  def add_actor(actor)
+    @actors << actor
+    sort_actors
+  end
+  
+  def sort_actors
+    @actors.sort_by! { |a| a.priority }.reverse!
+  end
+  
   def actor_occupying(x, y)
     @actors.each do |actor|
       if actor.x == x and actor.y == y
@@ -65,18 +74,18 @@ class Game
     rng = rand(100)
     if rng < 80
       # create an orc
-      orc = Actor.new(x, y, 'o', 'orc', 'green')
+      orc = Actor.new(x, y, 'o', 'orc', 'green', 1)
       orc.destructible = MonsterDestructible.new(orc, 10, 0, 'dead orc')
       orc.attacker = Attacker.new(orc, 3)
       orc.ai = MonsterAi.new(orc)
-      @actors << orc
+      add_actor(orc)
     else
       # create a troll
-      troll = Actor.new(x, y, 'T', 'troll', '0,128,0')
+      troll = Actor.new(x, y, 'T', 'troll', '0,128,0', 1)
       troll.destructible = MonsterDestructible.new(troll, 16, 1, 'troll carcass')
       troll.attacker = Attacker.new(troll, 4)
       troll.ai = MonsterAi.new(troll)
-      @actors << troll
+      add_actor(troll)
     end
   end
   
@@ -84,24 +93,24 @@ class Game
     dice = rand(100)
     if dice < 70
       # create a health potion
-      health_potion = Actor.new(x, y, '!', 'health potion', 'purple', false)
+      health_potion = Actor.new(x, y, '!', 'health potion', 'purple', 2, false)
       health_potion.pickable = Healer.new(health_potion, 4)
-      @actors << health_potion
+      add_actor(health_potion)
     elsif dice < 80
       # create a scroll of lightning bolt
-      lightning_scroll = Actor.new(x, y, '#', 'scroll of lightning bolt', 'yellow', false)
+      lightning_scroll = Actor.new(x, y, '#', 'scroll of lightning bolt', 'yellow', 2, false)
       lightning_scroll.pickable = LightningBolt.new(lightning_scroll, 5, 20)
-      @actors << lightning_scroll
+      add_actor(lightning_scroll)
     elsif dice < 90
       # create a scroll of fireball
-      fireball_scroll = Actor.new(x, y, '#', 'scroll of fireball', 'orange', false)
+      fireball_scroll = Actor.new(x, y, '#', 'scroll of fireball', 'orange', 2, false)
       fireball_scroll.pickable = Fireball.new(fireball_scroll, 3, 12)
-      @actors << fireball_scroll
+      add_actor(fireball_scroll)
     else
       # create a scroll of confusion
-      confusion_scroll = Actor.new(x, y, '#', 'scroll of confusion', 'violet', false)
+      confusion_scroll = Actor.new(x, y, '#', 'scroll of confusion', 'violet', 2, false)
       confusion_scroll.pickable = Confuser.new(confusion_scroll, 10, 8)
-      @actors << confusion_scroll
+      add_actor(confusion_scroll)
     end
   end
   
@@ -131,11 +140,6 @@ class Game
     end
     
     @fov_recompute = false
-  end
-  
-  def send_to_back(actor)
-    @actors.delete(actor)
-    @actors.insert(0, actor)
   end
   
   def distance_between(x1, y1, x2, y2)

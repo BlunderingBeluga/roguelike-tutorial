@@ -33,7 +33,8 @@ class Destructible
     @owner.color = 'red'
     @owner.name = @corpse_name
     @owner.blocks = false
-    $game.send_to_back(@owner)
+    @owner.priority = 3
+    $game.sort_actors
   end
   
   def heal(amount)

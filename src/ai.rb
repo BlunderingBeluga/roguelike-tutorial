@@ -47,6 +47,13 @@ class PlayerAi < Ai
         actor.pickable.use(@owner)
         $game.status = :new_turn
       end
+    when Terminal::TK_D
+      # _D_rop item
+      actor = choose_from_inventory
+      if actor
+        actor.pickable.drop(@owner)
+        $game.status = :new_turn
+      end
     when Terminal::TK_CLOSE
       Terminal.close
       exit
