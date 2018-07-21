@@ -1,4 +1,6 @@
 module Config
+  SAVE_FILE = './save'
+  
   ROOM_MAX_SIZE = 10
   ROOM_MIN_SIZE = 6
   MAX_ROOMS = 30 # you won't get that many, ROOM_TRIES is more accurate

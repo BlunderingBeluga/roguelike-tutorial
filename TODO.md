@@ -2,7 +2,8 @@
 
 ## Bugfixes
 
-* Check if monsters walking on corpses and/or monsters walking on items are mishandled
+* Monsters walking on corpses mishandled
+* Items dropped onto corpses not being accessible
 
 ## Features
 

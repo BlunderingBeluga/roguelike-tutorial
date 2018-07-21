@@ -55,8 +55,7 @@ class PlayerAi < Ai
         $game.status = :new_turn
       end
     when Terminal::TK_CLOSE
-      Terminal.close
-      exit
+      $game.done = true
     end
     
     unless (dx == 0 and dy == 0)

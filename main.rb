@@ -13,17 +13,10 @@ require './src/rectangle'
 
 
 class Game
-  attr_accessor :status, :fov_recompute
+  attr_accessor :status, :fov_recompute, :done
   attr_reader :player, :map, :last_event, :actors, :gui
   
   def setup
-    Terminal.open
-    Terminal.set("window.title = 'sample Ruby roguelike'")
-    Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
-    Terminal.set("input.filter = [keyboard, mouse]")
-    Terminal.set(
-      "window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT + Config::Gui::PANEL_HEIGHT}")
-    
     @gui = Gui.new(1, Config::MAP_HEIGHT)
     @actors = []
     
@@ -37,19 +30,65 @@ class Game
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
     
     @fov_recompute = true
+    @done = false
     
     @map.do_fov(@player.x, @player.y, Config::FOV_RADIUS)
     
     @game_status = :idle
     @gui.message("Welcome, stranger! Prepare to perish!", 'green')
+  end
+  
+  def load_game
+    load_hash = {}
+    File.open(Config::SAVE_FILE) do |f|
+      load_hash = Marshal.load(f.read)
+    end
+    @actors = load_hash['actors']
+    @gui = load_hash['gui']
+    @player = @actors[load_hash['player_idx']]
+    @map = load_hash['map']
+    @gui.message('Game loaded from save file.', 'orange')
+  end
+  
+  def save
+    save_hash = {}
+    save_hash['actors'] = @actors
+    save_hash['gui'] = @gui
+    save_hash['player_idx'] = @actors.index(@player)
+    save_hash['map'] = @map
+    File.open(Config::SAVE_FILE, 'w') do |f|
+      f.write(Marshal.dump(save_hash))
+    end
+  end
+  
+  def save_exists?
+    File.file?(Config::SAVE_FILE)
+  end
+  
+  def shutdown
+    save
+    Terminal.close
+    exit
+  end
+  
+  def run
+    Terminal.open
+    Terminal.set("window.title = 'sample Ruby roguelike'")
+    Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
+    Terminal.set("input.filter = [keyboard, mouse]")
+    Terminal.set(
+      "window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT + Config::Gui::PANEL_HEIGHT}")
+    save_exists? ? load_game : setup
     
-    until @last_event == Terminal::TK_CLOSE
+    until @done == true
       Terminal.clear
       render
       Terminal.refresh
       @last_event = Terminal.read
       update
-    end 
+    end
+    
+    shutdown 
   end
   
   def add_actor(actor)
@@ -198,3 +237,4 @@ end
 
 $game = Game.new
 $game.setup
+$game.run
