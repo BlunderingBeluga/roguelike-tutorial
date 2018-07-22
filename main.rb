@@ -1,6 +1,7 @@
 require './lib/BearLibTerminal'
 require './config'
 require './src/gui'
+require './src/menu'
 require './src/fov'
 require './src/actor'
 require './src/destructible'
@@ -44,7 +45,8 @@ class Game
       load_hash = Marshal.load(f.read)
     end
     @actors = load_hash['actors']
-    @gui = load_hash['gui']
+    @gui = Gui.new(1, Config::MAP_HEIGHT)
+    @gui.log = load_hash['log']
     @player = @actors[load_hash['player_idx']]
     @map = load_hash['map']
     @gui.message('Game loaded from save file.', 'orange')
@@ -53,7 +55,7 @@ class Game
   def save
     save_hash = {}
     save_hash['actors'] = @actors
-    save_hash['gui'] = @gui
+    save_hash['log'] = @gui.log
     save_hash['player_idx'] = @actors.index(@player)
     save_hash['map'] = @map
     File.open(Config::SAVE_FILE, 'w') do |f|
@@ -154,6 +156,11 @@ class Game
   end
   
   def render
+    if @gui.menu?
+      @gui.render
+      return
+    end
+    
     @map.render
     
     @actors.each do |actor|
@@ -164,6 +171,11 @@ class Game
   end
   
   def update
+    if @gui.menu?
+      @gui.update
+      return
+    end
+    
     @status = :idle
     
     @player.update

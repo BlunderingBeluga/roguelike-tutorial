@@ -1,10 +1,60 @@
 class Gui
+  attr_accessor :log 
+  
   def initialize(x, y)
     @log = []
     @x, @y = x, y
+    @menu = nil
+    @menu_handler = nil
+    @last_menu_value = nil
+  end
+  
+  # About the use of Gui#menu:
+  # The block will be called every time a key is pressed while the menu is open
+  # with the Gui itself passed as a parameter
+  # for instance:
+  # Gui.menu("Inventory", ["sword", "lantern", "ration"]) do |gui|
+  #   (do something with the Gui)
+  # end
+  # This means you can access Gui#last_menu_value, Gui#close, etc. in response
+  # to the key press.
+  def menu(title, items, &block)
+    @menu = Menu.new(title, items)
+    @menu_handler = block
+  end
+  
+  def menu?
+    !!@menu
+  end
+  
+  def last_menu_value
+    return false unless @menu or @last_menu_value
+    return @last_menu_value unless @menu
+    val = @menu.retrieve_value
+    if val
+      @last_menu_value = val
+    end
+    return @last_menu_value
+  end
+  
+  def update
+    close_menu if $game.last_event == Terminal::TK_ESCAPE
+    @menu.update if menu?
+    @menu_handler.call(self)
+  end
+  
+  def close_menu
+    @last_menu_value = nil
+    @menu = nil
+    @menu_handler = nil
   end
   
   def render
+    if menu?
+      @menu.render
+      return
+    end
+    
     render_bar(@x, @y, Config::Gui::BAR_WIDTH, 'HP', $game.player.destructible.hp,
       $game.player.destructible.max_hp, '255,115,115', '191,0,0')
       
