@@ -18,7 +18,6 @@ class Game
   attr_reader :player, :map, :last_event, :actors, :gui
   
   def setup
-    @gui = Gui.new(1, Config::MAP_HEIGHT)
     @actors = []
     
     @player = Actor.new(1, 1, '@', 'player', 'white', 1)
@@ -68,7 +67,6 @@ class Game
   end
   
   def shutdown
-    save
     Terminal.close
     exit
   end
@@ -79,8 +77,21 @@ class Game
     Terminal.set("font: assets/Fix15Mono-Bold.ttf, size=14x14")
     Terminal.set("input.filter = [keyboard, mouse]")
     Terminal.set(
-      "window.size = #{Config::MAP_WIDTH}x#{Config::MAP_HEIGHT + Config::Gui::PANEL_HEIGHT}")
-    save_exists? ? load_game : setup
+      "window.size = #{Config::WINDOW_WIDTH}x#{Config::WINDOW_HEIGHT}")
+    @gui = Gui.new(1, Config::MAP_HEIGHT)
+    @gui.clickable_menu("Sample Ruby Roguelike", ["New Game", "Load Game", "Quit"]) do |gui|
+      case gui.last_menu_value
+      when 'New Game'
+        setup
+        gui.close_menu
+      when 'Load Game'
+        load_game if save_exists?
+        gui.close_menu
+      when 'Quit'
+        shutdown
+        gui.close_menu
+      end
+    end
     
     until @done == true
       Terminal.clear
@@ -90,6 +101,7 @@ class Game
       update
     end
     
+    save
     shutdown 
   end
   
@@ -248,5 +260,4 @@ class Game
 end
 
 $game = Game.new
-$game.setup
 $game.run

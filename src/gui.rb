@@ -9,17 +9,22 @@ class Gui
     @last_menu_value = nil
   end
   
-  # About the use of Gui#menu:
+  # About the use of the Gui#clickable_menu and Gui#arrow_key_menu
   # The block will be called every time a key is pressed while the menu is open
   # with the Gui itself passed as a parameter
   # for instance:
-  # Gui.menu("Inventory", ["sword", "lantern", "ration"]) do |gui|
+  # Gui.arrow_key_menu("Inventory", ["sword", "lantern", "ration"]) do |gui|
   #   (do something with the Gui)
   # end
   # This means you can access Gui#last_menu_value, Gui#close, etc. in response
   # to the key press.
-  def menu(title, items, &block)
-    @menu = Menu.new(title, items)
+  def clickable_menu(title, items, &block)
+    @menu = ClickableMenu.new(title, items)
+    @menu_handler = block
+  end
+  
+  def arrow_key_menu(title, items, &block)
+    @menu = ArrowKeyMenu.new(title, items)
     @menu_handler = block
   end
   

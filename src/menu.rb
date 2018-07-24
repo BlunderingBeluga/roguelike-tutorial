@@ -16,23 +16,17 @@ class MenuItem
   end
 end
 
-
 class Menu
   def initialize(title, item_names)
     @title = title
     @items = item_names.map do |name|
       MenuItem.new(name)
     end
-    @last_value = nil
-    @selected_item_index = 0
-  end
-  
-  def selected?(item)
-    @items.index(item) == @selected_item_index
+    @last_value = false
   end
   
   def render
-    x = Config::MAP_WIDTH / 2 - @title.size / 2
+    x = Config::WINDOW_WIDTH / 2 - @title.size / 2
     Terminal.print(x, 1, @title)
     
     y = 3
@@ -42,6 +36,38 @@ class Menu
       item.render(selected?(item))
       y += 1
     end
+  end
+  
+  def update
+    # dummy method
+  end
+end
+
+class ClickableMenu < Menu
+  def selected?(item)
+    item.hover?($game.mouse_x, $game.mouse_y)
+  end
+  
+  def retrieve_value
+    if $game.last_event == Terminal::TK_MOUSE_LEFT
+      @items.each do |item|
+        if item.hover?($game.mouse_x, $game.mouse_y)
+          return item.name
+        end
+      end
+    end
+    return false
+  end
+end
+
+class ArrowKeyMenu < Menu
+  def initialize(title, item_names)
+    super
+    @selected_item_index = 0
+  end
+  
+  def selected?(item)
+    @items.index(item) == @selected_item_index
   end
   
   def retrieve_value
@@ -66,3 +92,4 @@ class Menu
     end
   end
 end
+    

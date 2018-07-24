@@ -4,6 +4,7 @@
 
 * Monsters walking on corpses mishandled
 * Items dropped onto corpses not being accessible
+* Game can't be closed while inside a menu
 
 ## Features
 

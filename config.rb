@@ -1,4 +1,11 @@
 module Config
+  module Gui
+    PANEL_HEIGHT = 7
+    BAR_WIDTH = 20 # width of health, mana, etc. display bars
+    MSG_X = BAR_WIDTH + 2
+    MSG_HEIGHT = PANEL_HEIGHT - 1
+  end
+  
   SAVE_FILE = './save'
   
   ROOM_MAX_SIZE = 10
@@ -8,6 +15,9 @@ module Config
   MAP_WIDTH = 60
   MAP_HEIGHT = 35
   
+  WINDOW_WIDTH = MAP_WIDTH
+  WINDOW_HEIGHT = MAP_HEIGHT + Gui::PANEL_HEIGHT
+  
   FOV_RADIUS = 8
   
   MAX_ROOM_MONSTERS = 3
@@ -15,11 +25,4 @@ module Config
   
   # how many turns monsters continue to chase players who have gone out of view
   TRACKING_TURNS = 3
-  
-  module Gui
-    PANEL_HEIGHT = 7
-    BAR_WIDTH = 20 # width of health, mana, etc. display bars
-    MSG_X = BAR_WIDTH + 2
-    MSG_HEIGHT = PANEL_HEIGHT - 1
-  end
 end
