@@ -87,31 +87,9 @@ class PlayerAi < Ai
   end
   
   def choose_from_inventory
-    Terminal.clear
-    Terminal.print(1, 1, "inventory")
-    shortcut = 'a'
-    @owner.container.inventory.each_with_index do |actor, y|
-      Terminal.print(2, y + 2, "(#{shortcut}) #{actor.name}")
-      shortcut = shortcut.succ
-    end
-    Terminal.refresh
-    # making "mouse move" an input type requires a lot of places to specify that
-    # moving the mouse doesn't count as "pressing a key"
-    key = Terminal::TK_MOUSE_MOVE
-    until key != Terminal::TK_MOUSE_MOVE
-      key = Terminal.read 
-    end
-    
-    # This is a bit weird.
-    # Terminal.read returns an integer. lib/BearLibTerminal.rb shows how key presses
-    # are mapped to constants (Terminal::TK_A and so on). "a" is 4, so we subtract 4
-    # to correct for that. `idx` gives us 0 for a, 1 for b, etc., so keys are
-    # correctly mapped to items in the inventory array. 
-    idx = key - 4
-    if idx >= 0 and idx < @owner.container.inventory.size
-      return @owner.container.inventory[idx]
-    else
-      nil
+    $game.gui.alphabet_menu("Inventory", @owner.container.inventory)
+    if $game.gui.last_menu_value
+      return $game.gui.last_menu_value.item
     end
   end
 end

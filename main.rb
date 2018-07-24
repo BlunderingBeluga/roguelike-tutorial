@@ -79,18 +79,19 @@ class Game
     Terminal.set(
       "window.size = #{Config::WINDOW_WIDTH}x#{Config::WINDOW_HEIGHT}")
     @gui = Gui.new(1, Config::MAP_HEIGHT)
-    @gui.clickable_menu("Sample Ruby Roguelike", ["New Game", "Load Game", "Quit"]) do |gui|
-      case gui.last_menu_value
+    @gui.clickable_menu("Sample Ruby Roguelike", ["New Game", "Load Game", "Quit"])
+    if @gui.last_menu_value
+      case @gui.last_menu_value.name
       when 'New Game'
         setup
-        gui.close_menu
       when 'Load Game'
         load_game if save_exists?
-        gui.close_menu
       when 'Quit'
         shutdown
-        gui.close_menu
       end
+    else
+      # close if ESCAPE is pressed in the startup menu
+      shutdown
     end
     
     until @done == true
@@ -168,11 +169,6 @@ class Game
   end
   
   def render
-    if @gui.menu?
-      @gui.render
-      return
-    end
-    
     @map.render
     
     @actors.each do |actor|
@@ -183,11 +179,6 @@ class Game
   end
   
   def update
-    if @gui.menu?
-      @gui.update
-      return
-    end
-    
     @status = :idle
     
     @player.update

@@ -5,61 +5,45 @@ class Gui
     @log = []
     @x, @y = x, y
     @menu = nil
-    @menu_handler = nil
     @last_menu_value = nil
   end
   
-  # About the use of the Gui#clickable_menu and Gui#arrow_key_menu
-  # The block will be called every time a key is pressed while the menu is open
-  # with the Gui itself passed as a parameter
-  # for instance:
-  # Gui.arrow_key_menu("Inventory", ["sword", "lantern", "ration"]) do |gui|
-  #   (do something with the Gui)
-  # end
-  # This means you can access Gui#last_menu_value, Gui#close, etc. in response
-  # to the key press.
-  def clickable_menu(title, items, &block)
+  def clickable_menu(title, items)
     @menu = ClickableMenu.new(title, items)
-    @menu_handler = block
+    menu!
   end
   
-  def arrow_key_menu(title, items, &block)
+  def arrow_key_menu(title, items)
     @menu = ArrowKeyMenu.new(title, items)
-    @menu_handler = block
+    menu!
   end
   
-  def menu?
-    !!@menu
+  def alphabet_menu(title, items)
+    @menu = AlphabetMenu.new(title, items)
+    menu!
+  end
+  
+  def menu!
+    loop do
+      if @menu.done?
+        @last_menu_value = @menu.retrieve_value
+        @menu = nil
+        break
+      end
+      Terminal.clear
+      @menu.render
+      Terminal.refresh
+      # having Game#last_event occasionally be inaccurate has broken nothing (yet)
+      key = Terminal.read 
+      @menu.update(key)
+    end
   end
   
   def last_menu_value
-    return false unless @menu or @last_menu_value
-    return @last_menu_value unless @menu
-    val = @menu.retrieve_value
-    if val
-      @last_menu_value = val
-    end
-    return @last_menu_value
-  end
-  
-  def update
-    close_menu if $game.last_event == Terminal::TK_ESCAPE
-    @menu.update if menu?
-    @menu_handler.call(self)
-  end
-  
-  def close_menu
-    @last_menu_value = nil
-    @menu = nil
-    @menu_handler = nil
+    @last_menu_value
   end
   
   def render
-    if menu?
-      @menu.render
-      return
-    end
-    
     render_bar(@x, @y, Config::Gui::BAR_WIDTH, 'HP', $game.player.destructible.hp,
       $game.player.destructible.max_hp, '255,115,115', '191,0,0')
       

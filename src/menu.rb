@@ -1,9 +1,10 @@
 class MenuItem
   attr_accessor :x, :y
-  attr_reader :name
+  attr_reader :name, :item
   
-  def initialize(name)
+  def initialize(name, item = nil)
     @name = name
+    @item = item if item
   end
   
   def hover?(x, y)
@@ -17,12 +18,19 @@ class MenuItem
 end
 
 class Menu
-  def initialize(title, item_names)
+  def initialize(title, items)
     @title = title
-    @items = item_names.map do |name|
-      MenuItem.new(name)
+    if items.first.is_a?(String)
+      @items = items.map do |name|
+        MenuItem.new(name)
+      end
+    else
+      @items = items.map do |item|
+        MenuItem.new(item.name, item)
+      end
     end
     @last_value = false
+    @done = false
   end
   
   def render
@@ -38,8 +46,22 @@ class Menu
     end
   end
   
-  def update
+  def update(key)
+    if key == Terminal::TK_ESCAPE
+      @done = true
+    end
+  end
+  
+  def selected?(item)
     # dummy method
+  end
+  
+  def retrieve_value
+    @last_value
+  end
+  
+  def done?
+    @done
   end
 end
 
@@ -48,20 +70,21 @@ class ClickableMenu < Menu
     item.hover?($game.mouse_x, $game.mouse_y)
   end
   
-  def retrieve_value
-    if $game.last_event == Terminal::TK_MOUSE_LEFT
+  def update(key)
+    super
+    if key == Terminal::TK_MOUSE_LEFT
       @items.each do |item|
         if item.hover?($game.mouse_x, $game.mouse_y)
-          return item.name
+          @last_value = item
+          @done = true
         end
       end
     end
-    return false
   end
 end
 
 class ArrowKeyMenu < Menu
-  def initialize(title, item_names)
+  def initialize(title, items)
     super
     @selected_item_index = 0
   end
@@ -70,15 +93,9 @@ class ArrowKeyMenu < Menu
     @items.index(item) == @selected_item_index
   end
   
-  def retrieve_value
-    if $game.last_event == Terminal::TK_ENTER
-      return @items[@selected_item_index].name
-    end
-    return false
-  end
-    
-  def update
-    case $game.last_event
+  def update(key)
+    super
+    case key
     when Terminal::TK_UP
       @selected_item_index -= 1
       if @selected_item_index < 0
@@ -89,6 +106,41 @@ class ArrowKeyMenu < Menu
       if @selected_item_index > @items.size - 1
         @selected_item_index = 0
       end
+    when $game.last_event == Terminal::TK_ENTER
+      @last_value = @items[@selected_item_index]
+      @done = true
+    end
+  end
+end
+
+class AlphabetMenu < Menu
+  def render
+    x = Config::WINDOW_WIDTH / 2 - @title.size / 2
+    Terminal.print(x, 1, @title)
+    
+    y = 3
+    shortcut = 'a'
+    @items.each do |item|
+      item.x = 6
+      item.y = y
+      Terminal.print(2, y, "(#{shortcut})")
+      item.render(selected?(item))
+      shortcut = shortcut.succ
+      y += 1
+    end
+  end
+  
+  def update(key)
+    super
+    # This is a bit weird.
+    # Terminal.read returns an integer. lib/BearLibTerminal.rb shows how key presses
+    # are mapped to constants (Terminal::TK_A and so on). "a" is 4, so we subtract 4
+    # to correct for that. `idx` gives us 0 for a, 1 for b, etc., so keys are
+    # correctly mapped to items in the inventory array. 
+    idx = key - 4
+    if idx >= 0 and idx < @items.size
+      @last_value = @items[idx]
+      @done = true
     end
   end
 end
