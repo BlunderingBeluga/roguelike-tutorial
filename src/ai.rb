@@ -54,8 +54,6 @@ class PlayerAi < Ai
         actor.pickable.drop(@owner)
         $game.status = :new_turn
       end
-    when Terminal::TK_CLOSE
-      $game.done = true
     end
     
     unless (dx == 0 and dy == 0)

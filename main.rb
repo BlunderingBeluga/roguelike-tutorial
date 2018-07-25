@@ -181,6 +181,8 @@ class Game
   def update
     @status = :idle
     
+    @done = true if @last_event == Terminal::TK_CLOSE
+    
     @player.update
     if @status == :new_turn
       @actors.each do |actor|
