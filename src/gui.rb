@@ -46,11 +46,15 @@ class Gui
   def render
     render_bar(@x, @y, Config::Gui::BAR_WIDTH, 'HP', $game.player.destructible.hp,
       $game.player.destructible.max_hp, '255,115,115', '191,0,0')
+    render_bar(@x, @y + 2, Config::Gui::BAR_WIDTH, "XP (#{$game.player.ai.xp_level})",
+      $game.player.destructible.xp, $game.player.ai.next_level_xp, '185,115,255', '95,0,191')
       
     @log.each_with_index do |msg, y|
       Terminal.print(Config::Gui::MSG_X, y + @y, # FIXME: confusing variable names
         "[color=#{msg.color}]#{msg.text}[/color]")
     end
+    
+    Terminal.print(@x + 3, @y + 4, "Dungeon level #{$game.level}")
   end
   
   def message(text, color)

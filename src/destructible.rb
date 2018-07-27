@@ -1,13 +1,14 @@
 class Destructible
-  attr_accessor :owner
+  attr_accessor :owner, :xp
   attr_reader :max_hp, :hp, :defense, :corpse_name
   
-  def initialize(owner, max_hp, defense, corpse_name)
+  def initialize(owner, max_hp, defense, corpse_name, xp)
     @owner = owner
     @max_hp = max_hp
     @hp = max_hp
     @defense = defense
     @corpse_name = corpse_name
+    @xp = xp # either XP creature has earned (player) OR XP you get for killing creature (monster)
   end
   
   def is_dead?
@@ -49,7 +50,8 @@ end
 
 class MonsterDestructible < Destructible
   def die
-    $game.gui.message("#{@owner.name} is dead", 'red')
+    $game.gui.message("#{@owner.name} is dead. You gain #{@owner.destructible.xp} XP", 'red')
+    $game.player.destructible.xp += @xp
     super
   end
 end

@@ -15,19 +15,23 @@ require './src/rectangle'
 
 class Game
   attr_accessor :status, :fov_recompute, :done
-  attr_reader :player, :map, :last_event, :actors, :gui
+  attr_reader :player, :map, :last_event, :actors, :gui, :stairs, :level
   
   def setup
     @actors = []
     
     @player = Actor.new(1, 1, '@', 'player', 'white', 1)
-    @player.destructible = PlayerDestructible.new(player, 30, 2, 'your cadaver')
+    @player.destructible = PlayerDestructible.new(player, 30, 2, 'your cadaver', 0)
     @player.attacker = Attacker.new(player, 5)
     @player.ai = PlayerAi.new(player)
     @player.container = Container.new(player, 26)
     add_actor(@player)
     
+    @stairs = Actor.new(0, 0, '>', 'stairs', 'white', 4, false, false)
+    add_actor(@stairs)
+    
     @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
+    @level = 1
     
     @fov_recompute = true
     @done = false
@@ -47,7 +51,9 @@ class Game
     @gui = Gui.new(1, Config::MAP_HEIGHT)
     @gui.log = load_hash['log']
     @player = @actors[load_hash['player_idx']]
+    @stairs = @actors[load_hash['stairs_idx']]
     @map = load_hash['map']
+    @level = load_hash['level']
     @gui.message('Game loaded from save file.', 'orange')
   end
   
@@ -56,7 +62,9 @@ class Game
     save_hash['actors'] = @actors
     save_hash['log'] = @gui.log
     save_hash['player_idx'] = @actors.index(@player)
+    save_hash['stairs_idx'] = @actors.index(@stairs)
     save_hash['map'] = @map
+    save_hash['level'] = @level
     File.open(Config::SAVE_FILE, 'w') do |f|
       f.write(Marshal.dump(save_hash))
     end
@@ -129,14 +137,14 @@ class Game
     if rng < 80
       # create an orc
       orc = Actor.new(x, y, 'o', 'orc', 'green', 1)
-      orc.destructible = MonsterDestructible.new(orc, 10, 0, 'dead orc')
+      orc.destructible = MonsterDestructible.new(orc, 10, 0, 'dead orc', 35)
       orc.attacker = Attacker.new(orc, 3)
       orc.ai = MonsterAi.new(orc)
       add_actor(orc)
     else
       # create a troll
       troll = Actor.new(x, y, 'T', 'troll', '0,128,0', 1)
-      troll.destructible = MonsterDestructible.new(troll, 16, 1, 'troll carcass')
+      troll.destructible = MonsterDestructible.new(troll, 16, 1, 'troll carcass', 100)
       troll.attacker = Attacker.new(troll, 4)
       troll.ai = MonsterAi.new(troll)
       add_actor(troll)
@@ -172,7 +180,11 @@ class Game
     @map.render
     
     @actors.each do |actor|
-      actor.render if @map.is_lit?(actor.x, actor.y)
+      if @map.is_lit?(actor.x, actor.y)
+        actor.render 
+      elsif @map.is_explored?(actor.x, actor.y) and not actor.fov_only
+        actor.render(false)
+      end
     end
     
     @gui.render
@@ -249,6 +261,21 @@ class Game
         exit
       end
     end
+  end
+  
+  def next_level
+    @level += 1
+    @gui.message('You take a moment to rest, and recover your strength.', 'violet')
+    @player.destructible.heal(@player.destructible.max_hp / 2)
+    @gui.message('After a rare moment of peace, you descend deeper...', 'red')
+    
+    @actors.clear
+    add_actor(@player)
+    add_actor(@stairs)
+    
+    @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
+    @fov_recompute = true
+    @status = :new_turn
   end
 end
 

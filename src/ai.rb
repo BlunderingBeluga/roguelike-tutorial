@@ -9,10 +9,33 @@ class Ai
   end
 end
 
-class PlayerAi < Ai  
+class PlayerAi < Ai
+  attr_reader :xp_level
+  
+  LEVEL_UP_BASE = 200
+  LEVEL_UP_FACTOR = 150
+  
+  def initialize(owner)
+    super
+    @xp_level = 1
+  end
+  
+  def next_level_xp
+    LEVEL_UP_BASE + @xp_level * LEVEL_UP_FACTOR
+  end
+  
   def update
     return false if @owner.destructible and @owner.destructible.is_dead?
+    # level up
+    level_up_xp = next_level_xp
     
+    if @owner.destructible.xp >= level_up_xp
+      @xp_level += 1
+      @owner.destructible.xp -= level_up_xp
+      $game.gui.message("Your battle skills grow stronger! You reached level #{@xp_level}.", 'yellow')
+    end
+    
+    # handle keys
     dx, dy = 0, 0
     
     case $game.last_event
@@ -53,6 +76,15 @@ class PlayerAi < Ai
       if actor
         actor.pickable.drop(@owner)
         $game.status = :new_turn
+      end
+    when Terminal::TK_PERIOD
+      if Terminal.check?(Terminal::TK_SHIFT)
+        # Go down (>)
+        if $game.stairs.x == @owner.x and $game.stairs.y == @owner.y
+          $game.next_level
+        else
+          $game.gui.message('There are no stairs here.', 'white')
+        end
       end
     end
     

@@ -109,6 +109,9 @@ class Map
           end
         end
         
+        $game.stairs.x = new_x
+        $game.stairs.y = new_y
+        
         rooms << new_room
         num_rooms += 1
       end
