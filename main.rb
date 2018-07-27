@@ -267,7 +267,8 @@ class Game
     @level += 1
     @gui.message('You take a moment to rest, and recover your strength.', 'violet')
     @player.destructible.heal(@player.destructible.max_hp / 2)
-    @gui.message('After a rare moment of peace, you descend deeper...', 'red')
+    @gui.message('After a rare moment of peace, you descend deeper into the heart of the dungeon.',
+      'red')
     
     @actors.clear
     add_actor(@player)

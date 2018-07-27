@@ -58,6 +58,19 @@ class Gui
   end
   
   def message(text, color)
+    if text.size >= Config::Gui::MSG_WIDTH
+      lines = reformat_wrapped(text)
+      lines.each do |line|
+        message_line(line, color)
+      end
+    else
+      message_line(text, color)
+    end
+  end
+  
+  private
+  
+  def message_line(text, color)
     if @log.size >= Config::Gui::MSG_HEIGHT
       @log.shift until @log.size == Config::Gui::MSG_HEIGHT - 1
     end
@@ -65,7 +78,23 @@ class Gui
     @log << Message.new(text, color)
   end
   
-  private
+  # From the Ruby Cookbook, 1.15: Word-Wrapping Lines of Text
+  def reformat_wrapped(s, width = Config::Gui::MSG_WIDTH - 1)
+  	  lines = []
+  	  line = ""
+  	  s.split(/\s+/).each do |word|
+  	    if line.size + word.size >= width
+  	      lines << line
+  	      line = word
+  	    elsif line.empty?
+  	     line = word
+  	    else
+  	     line << " " << word
+  	   end
+  	   end
+  	   lines << line if line
+  	  return lines
+  	end
   
   def render_bar(x, y, width, name, value, max_value, bar_color, back_color)
     background = "[bkcolor=#{back_color}] [/bkcolor]" * width

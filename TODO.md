@@ -11,5 +11,4 @@
 
 ## Features
 
-* Allow overly long log messages to wrap
 * Better documentation of how the menu system works
