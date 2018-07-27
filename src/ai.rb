@@ -26,14 +26,8 @@ class PlayerAi < Ai
   
   def update
     return false if @owner.destructible and @owner.destructible.is_dead?
-    # level up
-    level_up_xp = next_level_xp
     
-    if @owner.destructible.xp >= level_up_xp
-      @xp_level += 1
-      @owner.destructible.xp -= level_up_xp
-      $game.gui.message("Your battle skills grow stronger! You reached level #{@xp_level}.", 'yellow')
-    end
+    advance_level if @owner.destructible.xp >= next_level_xp
     
     # handle keys
     dx, dy = 0, 0
@@ -120,6 +114,25 @@ class PlayerAi < Ai
     $game.gui.alphabet_menu("Inventory", @owner.container.inventory)
     if $game.gui.last_menu_value
       return $game.gui.last_menu_value.item
+    end
+  end
+  
+  def advance_level
+    @owner.destructible.xp -= next_level_xp
+    @xp_level += 1
+    $game.gui.message("Your battle skills grow stronger! You reached level #{@xp_level}.", 'yellow')
+    $game.gui.arrow_key_menu("Level up",
+      ['Constitution (+20 HP)', 'Strength (+1 attack)', 'Agility (+1 defense)'])
+    if $game.gui.last_menu_value
+      case $game.gui.last_menu_value.name
+      when 'Constitution (+20 HP)'
+        @owner.destructible.max_hp += 20
+        @owner.destructible.hp += 20
+      when 'Strength (+1 attack)'
+        @owner.attacker.power += 1
+      when 'Agility (+1 defense)'
+        @owner.destructible.defense += 1
+      end
     end
   end
 end

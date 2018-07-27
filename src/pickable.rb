@@ -63,7 +63,7 @@ class LightningBolt < Pickable
       $game.gui.message('No enemy is close enough to strike.', 'white')
       return false
     end
-    $game.gui.message("A lightning bolt strikes the #{closest.name} with a lound thunder!", 'cyan')
+    $game.gui.message("A lightning bolt strikes the #{closest.name} with a loud thunder!", 'cyan')
     $game.gui.message("The damage is #{@damage} hit points.", 'cyan')
     closest.destructible.take_damage(@damage)
     super

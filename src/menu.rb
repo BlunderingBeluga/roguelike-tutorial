@@ -106,7 +106,7 @@ class ArrowKeyMenu < Menu
       if @selected_item_index > @items.size - 1
         @selected_item_index = 0
       end
-    when $game.last_event == Terminal::TK_ENTER
+    when Terminal::TK_ENTER
       @last_value = @items[@selected_item_index]
       @done = true
     end

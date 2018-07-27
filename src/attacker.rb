@@ -12,11 +12,11 @@ class Attacker
         "#{@power - target.destructible.defense} hit points.",
         @owner == $game.player ? 'red' : 'yellow')
       else
-        $stderr.puts("#{@owner.name} attacks #{target.name} but it has no effect!")
+        $game.gui.message("#{@owner.name} attacks #{target.name} but it has no effect!", 'white')
       end
       target.destructible.take_damage(@power)
     else
-      $stderr.puts("#{@owner.name} attacks #{target.name} in vain.")
+      $game.gui.message("#{@owner.name} attacks #{target.name} in vain.", 'white')
     end
   end
 end

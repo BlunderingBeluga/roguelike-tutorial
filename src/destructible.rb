@@ -1,6 +1,6 @@
 class Destructible
-  attr_accessor :owner, :xp
-  attr_reader :max_hp, :hp, :defense, :corpse_name
+  attr_accessor :owner, :xp, :defense
+  attr_reader :max_hp, :hp, :corpse_name
   
   def initialize(owner, max_hp, defense, corpse_name, xp)
     @owner = owner
