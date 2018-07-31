@@ -1,5 +1,6 @@
 require './lib/BearLibTerminal'
 require './config'
+require './src/rng_utils'
 require './src/gui'
 require './src/menu'
 require './src/fov'
@@ -21,8 +22,8 @@ class Game
     @actors = []
     
     @player = Actor.new(1, 1, '@', 'player', 'white', 1)
-    @player.destructible = PlayerDestructible.new(player, 30, 2, 'your cadaver', 0)
-    @player.attacker = Attacker.new(player, 5)
+    @player.destructible = PlayerDestructible.new(player, 100, 1, 'your cadaver', 0)
+    @player.attacker = Attacker.new(player, 4)
     @player.ai = PlayerAi.new(player)
     @player.container = Container.new(player, 26)
     add_actor(@player)
@@ -30,8 +31,8 @@ class Game
     @stairs = Actor.new(0, 0, '>', 'stairs', 'white', 4, false, false)
     add_actor(@stairs)
     
-    @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
     @level = 1
+    @map = Map.new(Config::MAP_WIDTH, Config::MAP_HEIGHT)
     
     @fov_recompute = true
     @done = false
@@ -133,47 +134,19 @@ class Game
   end
   
   def create_monster(x, y)
-    rng = rand(100)
-    if rng < 80
-      # create an orc
-      orc = Actor.new(x, y, 'o', 'orc', 'green', 1)
-      orc.destructible = MonsterDestructible.new(orc, 10, 0, 'dead orc', 35)
-      orc.attacker = Attacker.new(orc, 3)
-      orc.ai = MonsterAi.new(orc)
-      add_actor(orc)
-    else
-      # create a troll
-      troll = Actor.new(x, y, 'T', 'troll', '0,128,0', 1)
-      troll.destructible = MonsterDestructible.new(troll, 16, 1, 'troll carcass', 100)
-      troll.attacker = Attacker.new(troll, 4)
-      troll.ai = MonsterAi.new(troll)
-      add_actor(troll)
-    end
+    mons_name = RNGUtilities.weighted_random(Config::ActorSpecs.monster_names)
+    mons = Config::ActorSpecs.monster(mons_name)
+    mons.x = x
+    mons.y = y
+    add_actor(mons)
   end
   
   def create_item(x, y)
-    dice = rand(100)
-    if dice < 70
-      # create a health potion
-      health_potion = Actor.new(x, y, '!', 'health potion', 'purple', 2, false)
-      health_potion.pickable = Healer.new(health_potion, 4)
-      add_actor(health_potion)
-    elsif dice < 80
-      # create a scroll of lightning bolt
-      lightning_scroll = Actor.new(x, y, '#', 'scroll of lightning bolt', 'yellow', 2, false)
-      lightning_scroll.pickable = LightningBolt.new(lightning_scroll, 5, 20)
-      add_actor(lightning_scroll)
-    elsif dice < 90
-      # create a scroll of fireball
-      fireball_scroll = Actor.new(x, y, '#', 'scroll of fireball', 'orange', 2, false)
-      fireball_scroll.pickable = Fireball.new(fireball_scroll, 3, 12)
-      add_actor(fireball_scroll)
-    else
-      # create a scroll of confusion
-      confusion_scroll = Actor.new(x, y, '#', 'scroll of confusion', 'violet', 2, false)
-      confusion_scroll.pickable = Confuser.new(confusion_scroll, 10, 8)
-      add_actor(confusion_scroll)
-    end
+    item_name = RNGUtilities.weighted_random(Config::ActorSpecs.item_names)
+    item = Config::ActorSpecs.item(item_name)
+    item.x = x
+    item.y = y
+    add_actor(item)
   end
   
   def render

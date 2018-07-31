@@ -124,7 +124,7 @@ class Map
         @tiles[x + y * width].can_walk = true
       end
     end
-    nb_items = rand(Config::MAX_ROOM_ITEMS)
+    nb_items = RNGUtilities.from_level(Config::ITEM_CAPS_BY_LEVEL, $game.level)
     nb_items.times do
       x = rand(room.x2 - room.x1) + room.x1
       y = rand(room.y2 - room.y1) + room.y1
@@ -132,7 +132,7 @@ class Map
         $game.create_item(x, y)
       end
     end
-    nb_monsters = rand(Config::MAX_ROOM_MONSTERS)
+    nb_monsters = RNGUtilities.from_level(Config::MONSTER_CAPS_BY_LEVEL, $game.level)
     nb_monsters.times do
       x = rand(room.x2 - room.x1) + room.x1
       y = rand(room.y2 - room.y1) + room.y1
