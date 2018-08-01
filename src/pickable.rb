@@ -12,7 +12,9 @@ class Pickable
   end
   
   def use(wearer)
-    if wearer.container
+    if wearer.can_equip and @owner.equippable
+      wearer.can_equip.toggle_equip(@owner)
+    elsif wearer.container
       wearer.container.remove(@owner)
       return true
     end
@@ -40,10 +42,10 @@ class Healer < Pickable
     if wearer.destructible
       healed = wearer.destructible.heal(@amount)
       if healed > 0
-        $game.gui.message("You are healed for #{@amount} HP.", 'white')
+        $game.gui.message("You are healed for #{@amount} HP.", 'green')
         return super
       else
-        $game.gui.message("You are already at full health.", 'white')
+        $game.gui.message("You are already at full health.", 'yellow')
       end
     end
     false

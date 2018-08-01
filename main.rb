@@ -10,9 +10,10 @@ require './src/ai'
 require './src/pickable'
 require './src/container'
 require './src/attacker'
+require './src/equippable'
+require './src/can_equip'
 require './src/map'
 require './src/rectangle'
-
 
 class Game
   attr_accessor :status, :fov_recompute, :done
@@ -23,12 +24,19 @@ class Game
     
     @player = Actor.new(1, 1, '@', 'player', 'white', 1)
     @player.destructible = PlayerDestructible.new(player, 100, 1, 'your cadaver', 0)
-    @player.attacker = Attacker.new(player, 4)
+    @player.attacker = Attacker.new(player, 2)
     @player.ai = PlayerAi.new(player)
     @player.container = Container.new(player, 26)
+    @player.can_equip = CanEquip.new(player)
+    
+    dagger = Actor.new(1, 1, '-', 'dagger', 'sky', 2, false)
+    dagger.pickable = Pickable.new(dagger)
+    dagger.equippable = Equippable.new(dagger, :main_hand, 2, 0, 0)
+    @player.container.add(dagger)
+    
     add_actor(@player)
     
-    @stairs = Actor.new(0, 0, '>', 'stairs', 'white', 4, false, false)
+    @stairs = Actor.new(1, 1, '>', 'stairs', 'white', 4, false, false)
     add_actor(@stairs)
     
     @level = 1

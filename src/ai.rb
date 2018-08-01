@@ -126,12 +126,12 @@ class PlayerAi < Ai
     if $game.gui.last_menu_value
       case $game.gui.last_menu_value.name
       when 'Constitution (+20 HP)'
-        @owner.destructible.max_hp += 20
+        @owner.destructible.base_max_hp += 20
         @owner.destructible.hp += 20
       when 'Strength (+1 attack)'
-        @owner.attacker.power += 1
+        @owner.attacker.base_power += 1
       when 'Agility (+1 defense)'
-        @owner.destructible.defense += 1
+        @owner.destructible.base_defense += 1
       end
     end
   end

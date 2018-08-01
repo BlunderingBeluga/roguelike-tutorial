@@ -56,6 +56,8 @@ module Config
     def self.item_names
       {
         health_potion: 35,
+        sword: RNGUtilities.from_level({ 5 => 4 }, $game.level),
+        shield: RNGUtilities.from_level({ 15 => 8 }, $game.level),
         confusion_scroll: RNGUtilities.from_level({ 10 => 2 }, $game.level),
         lightning_scroll: RNGUtilities.from_level({ 25 => 4 }, $game.level),
         fireball_scroll: RNGUtilities.from_level({ 25 => 6 }, $game.level)
@@ -68,6 +70,16 @@ module Config
         health_potion = Actor.new(1, 1, '!', 'health potion', 'purple', 2, false)
         health_potion.pickable = Healer.new(health_potion, 40)
         return health_potion
+      when :sword
+        sword = Actor.new(1, 1, '/', 'sky', 'sword', 2, false)
+        sword.pickable = Pickable.new(sword)
+        sword.equippable = Equippable.new(sword, :main_hand, 3, 0, 0)
+        return sword
+      when :shield
+        shield = Actor.new(1, 1, '[', 'orange', 'shield', 2, false)
+        shield.pickable = Pickable.new(shield)
+        shield.equippable = Equippable.new(shield, :off_hand, 0, 1, 0)
+        return shield
       when :confusion_scroll
         confusion_scroll = Actor.new(1, 1, '#', 'scroll of confusion', 'violet', 2, false)
         confusion_scroll.pickable = Confuser.new(confusion_scroll, 10, 8)

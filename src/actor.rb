@@ -1,6 +1,6 @@
 class Actor
   attr_accessor :x, :y, :char, :name, :color, :blocks, :attacker, :destructible,
-    :ai, :pickable, :container, :priority, :fov_only
+    :ai, :pickable, :container, :priority, :fov_only, :can_equip, :equippable
   
   def initialize(x, y, char, name, color, priority, blocks = true, fov_only = true)
     @x, @y, @char, @name, @color, @priority = x, y, char, name, color, priority

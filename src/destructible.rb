@@ -1,14 +1,32 @@
 class Destructible
-  attr_accessor :owner, :xp, :defense, :max_hp, :hp
+  attr_accessor :owner, :xp, :defense, :base_max_hp, :hp, :base_defense
   attr_reader :corpse_name
   
   def initialize(owner, max_hp, defense, corpse_name, xp)
     @owner = owner
-    @max_hp = max_hp
+    @base_max_hp = max_hp
     @hp = max_hp
-    @defense = defense
+    @base_defense = defense
     @corpse_name = corpse_name
     @xp = xp # either XP creature has earned (player) OR XP you get for killing creature (monster)
+  end
+  
+  def max_hp
+    if @owner.can_equip
+      bonus = @owner.can_equip.max_hp_bonus
+    else
+      bonus = 0
+    end
+    @base_max_hp + bonus
+  end
+  
+  def defense
+    if @owner.can_equip
+      bonus = @owner.can_equip.defense_bonus
+    else
+      bonus = 0
+    end
+    @base_defense + bonus
   end
   
   def is_dead?
@@ -16,7 +34,7 @@ class Destructible
   end
   
   def take_damage(damage)
-    damage -= @defense
+    damage -= defense
     
     if damage > 0
       @hp -= damage
@@ -40,9 +58,9 @@ class Destructible
   
   def heal(amount)
     @hp += amount;
-    if @hp > @max_hp
-      amount -= (@hp - @max_hp)
-      @hp = @max_hp
+    if @hp > max_hp
+      amount -= (@hp - max_hp)
+      @hp = max_hp
     end
     amount
   end
