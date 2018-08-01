@@ -65,6 +65,11 @@ class PlayerAi < Ai
         $game.status = :new_turn
       end
     when Terminal::TK_D
+      if Terminal.check?(Terminal::TK_CONTROL) and $DEBUG
+        # _D_ebug instead
+        debug_menu
+        return
+      end
       # _D_rop item
       actor = choose_from_inventory
       if actor
@@ -114,6 +119,32 @@ class PlayerAi < Ai
     $game.gui.alphabet_menu("Inventory", @owner.container.inventory)
     if $game.gui.last_menu_value
       return $game.gui.last_menu_value.item
+    end
+  end
+  
+  def debug_menu
+    $game.gui.clickable_menu('Debug options', ['Spawn monster', 'Spawn item'])
+    if $game.gui.last_menu_value
+      case $game.gui.last_menu_value.name
+      when 'Spawn monster'
+        $game.gui.clickable_menu('Spawn monster',
+          Config::ActorSpecs.monster_names.map { |name, freq| name.to_s })
+        if $game.gui.last_menu_value
+          mons = Config::ActorSpecs.monster($game.gui.last_menu_value.name.intern)
+          $game.add_actor(mons)
+          mons.x = $game.player.x + 1
+          mons.y = $game.player.y + 1
+        end
+      when 'Spawn item'
+        $game.gui.clickable_menu('Spawn item',
+          Config::ActorSpecs.item_names.map { |name, freq| name.to_s })
+        if $game.gui.last_menu_value
+          item = Config::ActorSpecs.item($game.gui.last_menu_value.name.intern)
+          $game.add_actor(item)
+          item.x = $game.player.x + 1
+          item.y = $game.player.y + 1
+        end
+      end
     end
   end
   

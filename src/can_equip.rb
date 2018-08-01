@@ -39,6 +39,8 @@ class CanEquip
       if @slots[slot] == equippable_actor
         $game.gui.message("Dequipped #{equippable_actor.name}.", 'yellow') # no, that isn't a word
         @slots.delete(slot)
+      else
+        $game.gui.message("There is already an item in that slot.", 'white')
       end
     else
       $game.gui.message("Equipped #{equippable_actor.name}.", 'green')
