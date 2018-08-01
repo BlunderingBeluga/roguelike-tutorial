@@ -23,6 +23,11 @@ class Gui
     menu!
   end
   
+  def inventory_menu(title, items)
+    @menu = InventoryMenu.new(title, items)
+    menu!
+  end
+  
   def menu!
     loop do
       if @menu.done?

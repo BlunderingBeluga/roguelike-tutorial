@@ -116,7 +116,7 @@ class PlayerAi < Ai
   end
   
   def choose_from_inventory
-    $game.gui.alphabet_menu("Inventory", @owner.container.inventory)
+    $game.gui.inventory_menu("Inventory", @owner.container.inventory)
     if $game.gui.last_menu_value
       return $game.gui.last_menu_value.item
     end

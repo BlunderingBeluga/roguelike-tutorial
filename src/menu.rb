@@ -145,3 +145,25 @@ class AlphabetMenu < Menu
   end
 end
     
+class InventoryMenu < AlphabetMenu
+  # Displays equipped equipment differently (possible HACK)
+  def render
+    x = Config::WINDOW_WIDTH / 2 - @title.size / 2
+    Terminal.print(x, 1, @title)
+    
+    y = 3
+    shortcut = 'a'
+    @items.each do |item|
+      item.x = 6
+      item.y = y
+      Terminal.print(2, y, "(#{shortcut})")
+      item.render(selected?(item))
+      # this is getting somewhat absurd, no?
+      if item.item and item.item.equippable and item.item.equippable.equipped
+        Terminal.print(item.name.size + 7, y, "(#{item.item.equippable.slot})")
+      end
+      shortcut = shortcut.succ
+      y += 1
+    end
+  end
+end

@@ -54,8 +54,10 @@ module Config
     end
     
     def self.item_names
+      # Items which don't generate randomly DO need to be put into this list; key them to 0
       {
         health_potion: 35,
+        dagger: 0,
         sword: RNGUtilities.from_level({ 5 => 4 }, $game.level),
         shield: RNGUtilities.from_level({ 15 => 8 }, $game.level),
         confusion_scroll: RNGUtilities.from_level({ 10 => 2 }, $game.level),
@@ -73,12 +75,17 @@ module Config
       when :sword
         sword = Actor.new(1, 1, '/', 'sword', 'sky', 2, false)
         sword.pickable = Pickable.new(sword)
-        sword.equippable = Equippable.new(sword, :main_hand, 3, 0, 0)
+        sword.equippable = Equippable.new(sword, 'main hand', 3, 0, 0)
         return sword
+      when :dagger
+        dagger = Actor.new(1, 1, '-', 'dagger', 'sky', 2, false)
+        dagger.pickable = Pickable.new(dagger)
+        dagger.equippable = Equippable.new(dagger, 'main hand', 2, 0, 0)
+        return dagger
       when :shield
-        shield = Actor.new(1, 1, '[', 'shield', 'orange', 2, false)
+        shield = Actor.new(1, 1, '(', 'shield', 'orange', 2, false)
         shield.pickable = Pickable.new(shield)
-        shield.equippable = Equippable.new(shield, :off_hand, 0, 1, 0)
+        shield.equippable = Equippable.new(shield, 'off hand', 0, 1, 0)
         return shield
       when :confusion_scroll
         confusion_scroll = Actor.new(1, 1, '#', 'scroll of confusion', 'violet', 2, false)

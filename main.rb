@@ -29,10 +29,9 @@ class Game
     @player.container = Container.new(player, 26)
     @player.can_equip = CanEquip.new(player)
     
-    dagger = Actor.new(1, 1, '-', 'dagger', 'sky', 2, false)
-    dagger.pickable = Pickable.new(dagger)
-    dagger.equippable = Equippable.new(dagger, :main_hand, 2, 0, 0)
+    dagger = Config::ActorSpecs.item(:dagger)
     @player.container.add(dagger)
+    @player.can_equip.toggle_equip(dagger)
     
     add_actor(@player)
     
