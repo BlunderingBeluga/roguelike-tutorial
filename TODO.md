@@ -2,10 +2,6 @@
 
 ## Bugfixes
 
-* In general: things not seeming to realize properly what other things are in their spaces, such as:
-    * Monsters walking on corpses mishandled
-    * Items dropped onto corpses (or stairs) not being accessible
-		* Player and monster spawning on same square
 * Game can't be closed while inside a menu
 * Confused carcasses still moving after death
 * Healing potion on player with less than 4 HP of damage giving incorrect number for amount healed

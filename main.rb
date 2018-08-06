@@ -134,7 +134,12 @@ class Game
   def actor_occupying(x, y)
     @actors.each do |actor|
       if actor.x == x and actor.y == y
-        return actor
+        if block_given?
+          r = yield actor
+          return actor if r
+        else
+          return actor
+        end
       end
     end
     false

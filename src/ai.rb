@@ -44,7 +44,7 @@ class PlayerAi < Ai
     when Terminal::TK_G
       # _G_et item
       found = false
-      if actor = $game.actor_occupying(@owner.x, @owner.y) and actor.pickable
+      if actor = $game.actor_occupying(@owner.x, @owner.y) { |a| a.pickable }
         if actor.pickable.pick(@owner)
           found = true
           $game.status = :new_turn
@@ -196,21 +196,21 @@ class MonsterAi < Ai
   
   def move_or_attack(dx, dy)
     tx, ty = @owner.x + dx, @owner.y + dy # target coordinates
-    if $game.actor_occupying(tx, ty) == $game.player
+    if $game.actor_occupying(tx, ty) { |a| a == $game.player }
       @owner.attacker.attack($game.player)
       return true
     end
     
     # slide along walls
     if not $game.map.is_wall?(tx, ty) and
-      not (a = $game.actor_occupying(tx, ty) and a.blocks)
+      not $game.actor_occupying(tx, ty) { |a| a.blocks }
       @owner.x = tx
       @owner.y = ty
     elsif not $game.map.is_wall?(tx, @owner.y) and
-      not (a = $game.actor_occupying(tx, @owner.y) and a.blocks)
+      not $game.actor_occupying(tx, ty) { |a| a.blocks }
       @owner.x = tx
     elsif not $game.map.is_wall?(@owner.x, ty) and
-      not (a = $game.actor_occupying(@owner.x, ty) and a.blocks)
+      not $game.actor_occupying(tx, ty) { |a| a.blocks }
       @owner.y = ty
     else
       return false
@@ -232,11 +232,11 @@ class ConfusedMonsterAi < Ai
     tx = @owner.x + dx
     ty = @owner.y + dy
     if not $game.map.is_wall?(tx, ty) and
-      not (a = $game.actor_occupying(tx, ty) and a.blocks)
+      not $game.actor_occupying(tx, ty) { |a| a.blocks }
       @owner.x = tx
       @owner.y = ty
-    elsif a = $game.actor_occupying(tx, ty)
-      @owner.attacker.attack(a)
+    elsif actor = $game.actor_occupying(tx, ty) { |a| a.destructible and not a.destructible.is_dead? }
+      @owner.attacker.attack(actor)
     end
     @nb_turns -= 1
     if @nb_turns <= 0

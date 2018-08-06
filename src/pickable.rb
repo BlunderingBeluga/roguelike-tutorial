@@ -105,8 +105,8 @@ class Confuser < Pickable
     $game.gui.message('Left-click an enemy to confuse it,', 'cyan')
     $game.gui.message('or right-click to cancel.', 'cyan')
     if (x, y = $game.pick_a_tile(@range)) and x and y
-      actor = $game.actor_occupying(x, y)
-      unless actor and actor.ai and actor.blocks
+      actor = $game.actor_occupying(x, y) { |a| a.ai and a.blocks }
+      unless actor
         $game.gui.message("No creature there to be confused.", 'white')
         return
       end
