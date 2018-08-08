@@ -32,6 +32,7 @@ module Terminal
 				:windows
 			when /darwin|mac os/
 				:macosx
+ 
 			when /linux/
 				:linux
 			when /solaris|bsd/
@@ -43,11 +44,11 @@ module Terminal
 
 	case OS
 		when /linux/
-			Libname = "./libBearLibTerminal.so"
+			Libname = "./lib/blt/Linux#{1.size * 8}/libBearLibTerminal.so"
 		when /macosx/
-			Libname = "./libBearLibTerminal.dylib"
+			Libname = "./lib/blt/OSX/libBearLibTerminal.dylib"
 		when /windows/
-			Libname = "BearLibTerminal.dll"
+			Libname = "#{File.dirname __FILE__ }/lib/blt/Windows#{1.size * 16}/BearLibTerminal.dll"
 	else
 		raise RuntimeError, "Unsupported OS: #{OS}"
 	end
