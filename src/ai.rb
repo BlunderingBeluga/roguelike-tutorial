@@ -73,6 +73,10 @@ class PlayerAi < Ai
       # _D_rop item
       actor = choose_from_inventory
       if actor
+        if actor.equippable and @owner.can_equip and
+          @owner.can_equip.slots[actor.equippable.slot] == actor
+          @owner.can_equip.dequip(actor)
+        end
         actor.pickable.drop(@owner)
         $game.status = :new_turn
       end

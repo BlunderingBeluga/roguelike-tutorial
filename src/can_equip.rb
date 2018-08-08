@@ -1,6 +1,8 @@
 # For actors that can equip items
 
 class CanEquip
+  attr_reader :slots
+  
   def initialize(owner)
     @owner = owner
     @slots = {}
@@ -33,20 +35,28 @@ class CanEquip
     bonus
   end
   
-  def toggle_equip(equippable_actor)
-    slot = equippable_actor.equippable.slot
+  def dequip(equipment)
+    $game.gui.message("Dequipped #{equipment.name}.", 'yellow')
+    equipment.equippable.equipped = false # this is starting to get ridiculous
+    @slots.delete(equipment.equippable.slot)
+  end
+  
+  def equip(equipment)
+    $game.gui.message("Equipped #{equipment.name}.", 'green')
+    equipment.equippable.equipped = true
+    @slots[equipment.equippable.slot] = equipment
+  end
+  
+  def toggle_equip(equipment)
+    slot = equipment.equippable.slot
     if @slots[slot]
-      if @slots[slot] == equippable_actor
-        $game.gui.message("Dequipped #{equippable_actor.name}.", 'yellow') # no, that isn't a word
-        equippable_actor.equippable.equipped = false # this is starting to get ridiculous
-        @slots.delete(slot)
+      if @slots[slot] == equipment
+        dequip(equipment)
       else
         $game.gui.message("There is already an item in that slot.", 'white')
       end
     else
-      $game.gui.message("Equipped #{equippable_actor.name}.", 'green')
-      equippable_actor.equippable.equipped = true
-      @slots[slot] = equippable_actor
+      equip(equipment)
     end
   end
 end
