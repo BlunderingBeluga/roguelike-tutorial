@@ -3,8 +3,6 @@
 ## Bugfixes
 
 * Game can't be closed while inside a menu
-* Confused carcasses still moving after death
-* Healing potion on player with less than 4 HP of damage giving incorrect number for amount healed
 * Canceling a targeted effect silently wastes a turn
 * Level-up occurs one turn late
 

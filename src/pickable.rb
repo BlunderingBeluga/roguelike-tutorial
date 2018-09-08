@@ -42,7 +42,7 @@ class Healer < Pickable
     if wearer.destructible
       healed = wearer.destructible.heal(@amount)
       if healed > 0
-        $game.gui.message("You are healed for #{@amount} HP.", 'green')
+        $game.gui.message("You are healed for #{healed} HP.", 'green')
         return super
       else
         $game.gui.message("You are already at full health.", 'yellow')

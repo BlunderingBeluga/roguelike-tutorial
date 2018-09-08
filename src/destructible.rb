@@ -53,6 +53,7 @@ class Destructible
     @owner.name = @corpse_name
     @owner.blocks = false
     @owner.priority = 3
+    @owner.ai = nil if @owner.ai
     $game.sort_actors
   end
   
